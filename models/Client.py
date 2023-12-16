@@ -16,7 +16,7 @@ import argparse
 
 class Client:
 
-    def __init__(self, id, student_model,teacher_model, labset, unlabset, device, batch_size= 128):
+    def __init__(self, id, student_model,teacher_model, labset, unlabset, device, testset, batch_size= 128):
         self.id =id
         self.student_model= student_model.to(device)
         self.teacher_model = teacher_model.to(device)
@@ -25,6 +25,8 @@ class Client:
         self.unlabset= unlabset
         self.batch_size= batch_size
         self.metrics =[]
+        self.testset = testset
+        
 
     def genererate_psuedo_labels(self):
 
@@ -35,7 +37,7 @@ class Client:
           images =[]
           model_outputs=[]
           for (data, _) in unlab_loader:
-               data = data.to(device)
+               data = data.to(self.device)
                model_output = self.teacher_model(data)
                model_outputs.append(model_output)
                images.append(data)
@@ -44,7 +46,7 @@ class Client:
           top_k_probabilities, top_k_indices = torch.topk(images_probs, top_k, dim=0)
           new_dataset=[]
           for row in range(top_k):
-              for lab in range(num_classes):
+              for lab in range(10):  ##num_classes
                   image_idx = top_k_indices[row][lab]
                   new_dataset.append( (unlab_images[image_idx], lab) )
         pseudo_lab_dataloader = torch.utils.data.DataLoader(new_dataset, batch_size=self.batch_size, num_workers=2, shuffle =True, drop_last=True)
@@ -78,7 +80,7 @@ class Client:
         optimizer = optim.Adam(self.student_model.parameters())
         num_epochs = 50
         for epch in range(num_epochs):
-            for (data, labels) in trainloader:
+            for (data, labels) in dataloader:
                 if(data.shape[0]==1):
                   #print("hit")
                   continue
@@ -128,16 +130,16 @@ class Client:
         print("Fine Tuning Studet Model")
         self.finetune_student(lss_fn=lss_fn)
 
-        teacher_test_loss, teacher_test_acc = self.compute_loss_accuracy(self.teacher_model, nn.CrossEntropyLoss(), testset)
+        teacher_test_loss, teacher_test_acc = self.compute_loss_accuracy(self.teacher_model, nn.CrossEntropyLoss(), self.testset)
         teacher_train_loss, teacher_train_acc = self.compute_loss_accuracy(self.teacher_model, nn.CrossEntropyLoss(), self.labset)
         student_train_loss, student_train_acc = self.compute_loss_accuracy(self.student_model, nn.CrossEntropyLoss(), self.labset)
-        student_test_loss, student_test_acc = self.compute_loss_accuracy(self.student_model, nn.CrossEntropyLoss(), testset)
+        student_test_loss, student_test_acc = self.compute_loss_accuracy(self.student_model, nn.CrossEntropyLoss(), self.testset)
         time_elap = time.time() - start_time
         metric_val= {
             'round': round,
             'teacher_test_loss':teacher_test_loss,
             'teacher_test_acc': teacher_test_acc,
-            'teacher_train_loss':teacher_train_acc,
+            'teacher_train_loss':teacher_train_loss,
             'teacher_train_acc':teacher_train_acc,
             'student_train_loss':student_train_loss,
             'student_train_acc':student_train_acc,

@@ -32,7 +32,7 @@ class Metrics:
 
 class Server:
 
-    def __init__(self, teacher_model,student_model,labeled_data, unlab_data, device):
+    def __init__(self, teacher_model,student_model,labeled_data, unlab_data, device, testset):
         self.global_student_model= student_model.to(device)
         self.global_teacher_model = teacher_model.to(device)
         self.device= device
@@ -41,6 +41,7 @@ class Server:
         self.unlab_data = unlab_data
         self.batch_size = 128
         self.metrics=[]
+        self.testset = testset
 
     def addClient(self, client):
         self.client_list.append(client)

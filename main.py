@@ -19,7 +19,7 @@ import argparse
 
 from models.Client import Client
 from models.Server import Server, Metrics
-from Datafetcher import AugmentedDataset, get_datasets
+from Datafetcher import AugmentedDataset, get_datasets, get_test_set
 
 
 def parse_arguments():
@@ -115,16 +115,17 @@ if __name__=='__main__':
     
     federated_datasets = get_datasets(n=5, drop_label_percent=drop_label_percent, augment=True)
 
+    testset = get_test_set(dataset= dataset)
     # Accessing the first federated dataset
     labeled_data, unlabeled_data = federated_datasets[0]
 
     data_segregated= get_datasets(n=num_clients+1,drop_label_percent = drop_label_percent)
 
-    server = Server( get_model(teacher_string), get_model(student_string), labeled_data=data_segregated[0][0], unlab_data= data_segregated[0][1], device = getDevice() )
+    server = Server( get_model(teacher_string), get_model(student_string), labeled_data=data_segregated[0][0], unlab_data= data_segregated[0][1], device = getDevice(), testset=testset)
 
     for i in range(num_clients):
 
-        client = Client( i, get_model(teacher_string), get_model(student_string), labset= data_segregated[i+1][0], unlabset = data_segregated[i+1][1], device= getDevice() )
+        client = Client( i, get_model(teacher_string), get_model(student_string), labset= data_segregated[i+1][0], unlabset = data_segregated[i+1][1], device= getDevice(), testset= testset )
         server.addClient(client)
     
 

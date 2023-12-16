@@ -83,3 +83,18 @@ def get_datasets(n=2, drop_label_percent=20, augment=True):
 # labeled_data is a list of tuples (data tensor, label tensor)
 # unlabeled_data is a list of data tensors
 
+
+def get_test_set(dataset = 'cifar'):
+        if(dataset=='cifar'):
+            cifar10_transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            ])
+            testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=cifar10_transform)
+
+        return testset
+    
+        
+
+        
+    
