@@ -114,11 +114,11 @@ if __name__=='__main__':
 
     data_segregated= get_datasets(n=num_clients+1,drop_label_percent = drop_label_percent)
 
-    server = Server( get_model(teacher_model_string), get_model(student_model_string), labeled_data=data_segregated[0][0], unlab_data= data_segregated[0][1], device = getDevice() )
+    server = Server( get_model(teacher_string), get_model(student_string), labeled_data=data_segregated[0][0], unlab_data= data_segregated[0][1], device = getDevice() )
 
     for i in range(num_clients):
 
-        client = Client( i, get_model(teacher_model_string), get_model(student_model_string), labset= data_segregated[i+1][0], unlabset = data_segregated[i+1][1], device= getDevice() )
+        client = Client( i, get_model(teacher_string), get_model(student_string), labset= data_segregated[i+1][0], unlabset = data_segregated[i+1][1], device= getDevice() )
         server.addClient(client)
     
 
