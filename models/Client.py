@@ -49,8 +49,8 @@ class Client:
               for lab in range(10):  ##num_classes
                   image_idx = top_k_indices[row][lab]
                   new_dataset.append( (unlab_images[image_idx], lab) )
-        pseudo_lab_dataloader = torch.utils.data.DataLoader(new_dataset, batch_size=self.batch_size, num_workers=2, shuffle =True, drop_last=True)
-
+        pseudo_lab_dataloader = torch.utils.data.DataLoader(new_dataset, batch_size=self.batch_size, shuffle =True, drop_last=True)
+        
         return pseudo_lab_dataloader
 
 
