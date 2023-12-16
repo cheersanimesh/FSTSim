@@ -73,6 +73,12 @@ class Server:
               res.append(torch.mean(layer_tensor, dim =0))
 
             print(len(res))
+            print("___________RES________")
+            for i in res:
+                print(i.shape)
+            print("________RES____END_______")
+            for i in self.global_student_model.parameters():
+                    print(i.shape)
             for idx, param in enumerate(self.global_teacher_model.parameters()):
                 param.data = nn.parameter.Parameter(res[idx])
 
