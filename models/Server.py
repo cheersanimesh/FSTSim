@@ -72,6 +72,7 @@ class Server:
               layer_tensor = torch.stack(layer_list)
               res.append(torch.mean(layer_tensor, dim =0))
 
+            print(len(res))
             for idx, param in enumerate(self.global_teacher_model.parameters()):
                 param.data = nn.parameter.Parameter(res[idx])
 
