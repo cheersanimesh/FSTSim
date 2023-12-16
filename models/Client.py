@@ -37,6 +37,8 @@ class Client:
           images =[]
           model_outputs=[]
           for (data, _) in unlab_loader:
+               if(data.shape[0]==1):
+                    continue
                data = data.to(self.device)
                model_output = self.teacher_model(data)
                model_outputs.append(model_output)
