@@ -39,7 +39,7 @@ def parse_arguments():
     parser.add_argument('--teacher_backbone', type=str, required = True)
     parser.add_argument('--student_backbone', type=str, required=True)
     parser.add_argument('--policy', type=str, required=True)
-    parser.add_argument('--label_percent', type = str, required = True)
+    parser.add_argument('--label_percent', type = int, required = True)
     parser.add_argument('--num_rounds', type=int, required = True)
 
     return parser.parse_args()
