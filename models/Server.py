@@ -77,7 +77,7 @@ class Server:
             for i in res:
                 print(i.shape)
             print("________RES____END_______")
-            for i in self.global_student_model.parameters():
+            for i in self.global_teacher_model.parameters():
                     print(i.shape)
             for idx, param in enumerate(self.global_teacher_model.parameters()):
                 param.data = nn.parameter.Parameter(res[idx])
