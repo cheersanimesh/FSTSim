@@ -83,6 +83,12 @@ if __name__=='__main__':
     teacher_string = args.teacher_backbone
     student_string = args.student_backbone
 
+    if(dataset=='cifar'):
+            num_classes=10
+    elif(dataset=='mnist'):
+            num_classes=10
+    else:
+            num_classes=10
     environment_vars = {
         "batch_size":batch_size,
         "num_clients":num_clients,
