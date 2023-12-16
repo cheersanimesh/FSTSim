@@ -22,15 +22,6 @@ from models.Server import Server, Metrics
 from Datafetcher import AugmentedDataset, get_datasets
 
 
-if(torch.cuda.is_available()):
-    device = torch.device('cuda')
-    num_devices = torch.cuda.device_count()
-    print(f"Using GPU, num: {num_devices}")
-else:
-    device = torch.device('cpu')
-    num_devices = torch.cpu.device_count()
-    print(f"Using CPU, num: {num_devices}")
-
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('--num_clients', type=int, required=True)
@@ -103,6 +94,15 @@ if __name__=='__main__':
 
     file_string=session_id
 
+    if(torch.cuda.is_available()):
+        device = torch.device('cuda')
+        num_devices = torch.cuda.device_count()
+        print(f"Using GPU, num: {num_devices}")
+    else:
+        device = torch.device('cpu')
+        num_devices = torch.cpu.device_count()
+        print(f"Using CPU, num: {num_devices}")
+    
     for k in environment_vars:
         temp_string = f"_{k}_{environment_vars[k]}"
         file_string = file_string+temp_string
