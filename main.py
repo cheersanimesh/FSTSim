@@ -88,8 +88,8 @@ if __name__=='__main__':
         "num_clients":num_clients,
         "label_percent":drop_label_percent,
         "dataset":dataset,
-        "teacher_backbone":teacher_model_string,
-        "student_backbone":student_model_string
+        "teacher_backbone":teacher_string,
+        "student_backbone":student_string
     }
 
     file_string=session_id
