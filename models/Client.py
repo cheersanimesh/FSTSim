@@ -16,7 +16,7 @@ import argparse
 
 class Client:
 
-    def __init__(self, id, student_model,teacher_model, labset, unlabset, batch_size= 128, device= device):
+    def __init__(self, id, student_model,teacher_model, labset, unlabset, device, batch_size= 128):
         self.id =id
         self.student_model= student_model.to(device)
         self.teacher_model = teacher_model.to(device)
