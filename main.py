@@ -150,8 +150,6 @@ if __name__=='__main__':
         server.aggregate_teacher()
         if(not new_impl):
             server.aggregate_student()
-
-        
         
         teacher_test_loss, teacher_test_acc = server.compute_loss_accuracy(server.global_teacher_model, nn.CrossEntropyLoss(), testset)
         teacher_train_loss, teacher_train_acc = server.compute_loss_accuracy(server.global_teacher_model, nn.CrossEntropyLoss(), server.labeled_data )
