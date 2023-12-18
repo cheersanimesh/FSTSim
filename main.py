@@ -86,8 +86,8 @@ if __name__=='__main__':
     teacher_string = args.teacher_backbone
     student_string = args.student_backbone
     train_teacher_round = args.train_teacher_round
-    if(train_teacher_round==-1):
-        train_teacher_round = num_rounds
+    # if(train_teacher_round==-1):
+    #     train_teacher_round = num_rounds
     
 
     if(dataset=='cifar'):
