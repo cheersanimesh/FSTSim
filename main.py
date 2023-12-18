@@ -34,7 +34,7 @@ def parse_arguments():
     parser.add_argument('--num_rounds', type=int, required = True)
     parser.add_argument('--augment', type = bool, required= True)
     parser.add_argument('--iid', type = bool, required=True)
-    parser.add_argument('--train_teacher_round', type=bool, required=True)
+    parser.add_argument('--new_impl', type=bool, required=True)
 
     return parser.parse_args()
 
@@ -85,7 +85,7 @@ if __name__=='__main__':
     num_rounds = args.num_rounds
     teacher_string = args.teacher_backbone
     student_string = args.student_backbone
-    train_teacher_round = args.train_teacher_round
+    new_impl = args.new_impl
     # if(train_teacher_round==-1):
     #     train_teacher_round = num_rounds
     
@@ -144,15 +144,21 @@ if __name__=='__main__':
         start_time = time.time()
         for client_idx in range(num_clients):
             client = server.client_list[client_idx]
-            client.training_loop(round)
+            client.training_loop(round, new_impl, num_rounds = num_rounds)
             server.updateClient(client_idx, client=client)
-        server.aggregate_student()
+
         server.aggregate_teacher()
+        if(not new_impl):
+            server.aggregate_student()
+
+        
+        
         teacher_test_loss, teacher_test_acc = server.compute_loss_accuracy(server.global_teacher_model, nn.CrossEntropyLoss(), testset)
         teacher_train_loss, teacher_train_acc = server.compute_loss_accuracy(server.global_teacher_model, nn.CrossEntropyLoss(), server.labeled_data )
         student_train_loss, student_train_acc = server.compute_loss_accuracy(server.global_student_model, nn.CrossEntropyLoss(), server.labeled_data )
         student_test_loss, student_train_acc = server.compute_loss_accuracy(server.global_student_model, nn.CrossEntropyLoss(), testset)
         time_elap = time.time() - start_time
+
         metric_val= {
             'round': round,
             'teacher_test_loss':teacher_test_loss,

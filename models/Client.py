@@ -115,14 +115,20 @@ class Client:
             print(f"Completed Epoch {epch}")
         print(f"End Fine Tune Client id:{self.id} for {num_epochs} epochs")
 
-    def training_loop(self, round):
+    def training_loop(self, round, new_impl, num_rounds):
 
         print(f"Starting Training for Client id= {self.id}")
 
         start_time = time.time()
         lss_fn = nn.CrossEntropyLoss()
-        self.train_teacher(lss_fn)
+        print("Training teacher")
+        self.train_teacher(lss_fn=lss_fn)
 
+        # if(round < num_rounds/2):
+        #     self.train_teacher(lss_fn)
+        # elif(not new_impl):
+        #     self.train_teacher(lss_fn)
+        
         print("Generating Psuedo label")
         pseudo_lab_dataloader = self.genererate_psuedo_labels()
 
