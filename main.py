@@ -86,6 +86,9 @@ if __name__=='__main__':
     teacher_string = args.teacher_backbone
     student_string = args.student_backbone
     new_impl = args.new_impl
+    is_iid = args.iid
+    augment = args.augment
+    new_impl = args.new_impl
     # if(train_teacher_round==-1):
     #     train_teacher_round = num_rounds
     
@@ -102,11 +105,11 @@ if __name__=='__main__':
         "label_percent":drop_label_percent,
         "dataset":dataset,
         "teacher_backbone":teacher_string,
-        "student_backbone":student_string
+        "student_backbone":student_string,
+        'iid':is_iid,
+        'augment':augment,
+        'new_impl':new_impl
     }
-
-    is_iid = args.iid
-    augment = args.augment
 
     file_string=session_id
 
@@ -168,8 +171,6 @@ if __name__=='__main__':
             'student_test_loss':student_test_loss,
             'student_train_acc':student_train_acc,
             'time_elapsed':time_elap,
-            'iid':is_iid,
-            'augment':augment
             }
         server.metrics.insert(0,metric_val)
 
