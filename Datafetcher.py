@@ -20,7 +20,7 @@ class AugmentedDataset(Dataset):
             data = self.transform(data)
         return data, label
 
-def get_datasets(n=2, drop_label_percent=20, augment=True):
+def get_datasets(n=2, drop_label_percent=20, augment=True, dataset_type = 'mnist',iid = True):
     """
     Loads the CIFAR10 dataset, splits it into n parts, applies data augmentation,
     and creates tuples of tensors for labeled and unlabeled data.
@@ -33,29 +33,65 @@ def get_datasets(n=2, drop_label_percent=20, augment=True):
     Returns:
     list of tuples: Each tuple contains labeled and unlabeled data.
                     Labeled data is a list of tuples (data tensor, label tensor).
-                    Unlabeled data is a list of data tensors.
+                    Unlabeled data has an empty tensor as it's label.
     """
 
-    # Define transformations for the CIFAR10 dataset
-    cifar10_transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ])
+
+
+    # Check dataset type and define appropriate transformations
+    if dataset_type == 'cifar':
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ])
+    elif dataset_type == 'mnist':
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5,), (0.5,))
+        ])
+    else:
+        raise ValueError("Invalid dataset type. Choose 'cifar' or 'mnist'.")
 
     # Augmentation
     augmentation_transform = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
         transforms.RandomHorizontalFlip(),
-    ]) if augment else transforms.Compose([])
+    ]) if augment and dataset_type == 'cifar' else transforms.Compose([])
 
-    # Load CIFAR10 dataset
-    cifar10_dataset = datasets.CIFAR10(root='./data', train=True, download=True, transform=cifar10_transform)
-    augmented_dataset = AugmentedDataset(cifar10_dataset, transform=augmentation_transform)
+    # Load dataset
+    if dataset_type == 'cifar':
+        dataset = datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
+    elif dataset_type == 'mnist':
+        dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+
+    augmented_dataset = AugmentedDataset(dataset, transform=augmentation_transform)
+
 
     # Split dataset into n parts
     total_size = len(augmented_dataset)
     part_sizes = [total_size // n + (1 if i < total_size % n else 0) for i in range(n)]
-    subsets = random_split(augmented_dataset, part_sizes)
+    if iid:
+        subsets = random_split(augmented_dataset, part_sizes)
+    else:
+        # Group data by labels
+        label_to_data = [[] for _ in range(10)]  # Assuming 10 classes for CIFAR10 and MNIST
+        for idx in range(len(augmented_dataset)):
+            data, label = augmented_dataset[idx]
+            label_to_data[label].append((data, label))
+
+        # Distribute each label group across the subsets non-uniformly
+        subsets = [[] for _ in range(n)]
+        for label_group in label_to_data:
+            # Randomly distribute each label group across the subsets
+            for data, label in label_group:
+                subset_idx = np.random.choice(n)
+                subsets[subset_idx].append((data, label))
+
+        # Convert list of data points to Subset objects
+        subsets = [torch.utils.data.Subset(augmented_dataset, [idx for idx, _ in subset]) for subset in subsets]
+    else:
+        raise ValueError("Invalid split type. Choose 'IID' or 'Non-IID'.")
+
 
     federated_data = []
 
@@ -80,21 +116,3 @@ def get_datasets(n=2, drop_label_percent=20, augment=True):
 # # Accessing the first federated dataset
 # labeled_data, unlabeled_data = federated_datasets[0]
 
-# labeled_data is a list of tuples (data tensor, label tensor)
-# unlabeled_data is a list of data tensors
-
-
-def get_test_set(dataset = 'cifar'):
-        if(dataset=='cifar'):
-            cifar10_transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-            ])
-            testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=cifar10_transform)
-
-        return testset
-    
-        
-
-        
-    
