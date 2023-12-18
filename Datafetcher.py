@@ -93,7 +93,7 @@ def get_test_set(dataset = 'cifar'):
             testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=cifar10_transform)
 
         return testset
-    
+
         
 
         
