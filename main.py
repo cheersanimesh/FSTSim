@@ -32,6 +32,9 @@ def parse_arguments():
     parser.add_argument('--policy', type=str, required=True)
     parser.add_argument('--label_percent', type = int, required = True)
     parser.add_argument('--num_rounds', type=int, required = True)
+    parser.add_argument('--augment', type = bool, required= True)
+    parser.add_argument('--iid', type = bool, required=True)
+    parser.add_argument('--train_teacher_round', type=bool, required=True)
 
     return parser.parse_args()
 
@@ -82,6 +85,10 @@ if __name__=='__main__':
     num_rounds = args.num_rounds
     teacher_string = args.teacher_backbone
     student_string = args.student_backbone
+    train_teacher_round = args.train_teacher_round
+    if(train_teacher_round==-1):
+        train_teacher_round = num_rounds
+    
 
     if(dataset=='cifar'):
             num_classes=10
@@ -98,6 +105,9 @@ if __name__=='__main__':
         "student_backbone":student_string
     }
 
+    is_iid = args.iid
+    augment = args.augment
+
     file_string=session_id
 
     if(torch.cuda.is_available()):
@@ -113,13 +123,13 @@ if __name__=='__main__':
         temp_string = f"_{k}_{environment_vars[k]}"
         file_string = file_string+temp_string
     
-    federated_datasets = get_datasets(n=5, drop_label_percent=drop_label_percent, augment=True)
+    #federated_datasets = get_datasets(n=5, drop_label_percent=drop_label_percent, augment=True)
 
     testset = get_test_set(dataset= dataset)
     # Accessing the first federated dataset
-    labeled_data, unlabeled_data = federated_datasets[0]
+    #labeled_data, unlabeled_data = federated_datasets[0]
 
-    data_segregated= get_datasets(n=num_clients+1,drop_label_percent = drop_label_percent)
+    data_segregated= get_datasets(n=num_clients+1,drop_label_percent = drop_label_percent, dataset_type=dataset, augment=augment, iid = is_iid)
 
     server = Server( teacher_model=get_model(teacher_string), student_model=get_model(student_string), labeled_data=data_segregated[0][0], unlab_data= data_segregated[0][1], device = getDevice(), testset=testset)
 
@@ -153,14 +163,16 @@ if __name__=='__main__':
             'student_train_acc':student_train_acc,
             'student_test_loss':student_test_loss,
             'student_train_acc':student_train_acc,
-            'time_elapsed':time_elap
+            'time_elapsed':time_elap,
+            'iid':is_iid,
+            'augment':augment
             }
         server.metrics.insert(0,metric_val)
 
 
         server.broadcastStudent()
         server.broadcastTeacher()
-        print(metric_val)
+        print(metric_val) 
         print(f"Ending Round {round}")
     
     
