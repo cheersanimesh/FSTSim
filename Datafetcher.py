@@ -89,8 +89,6 @@ def get_datasets(n=2, drop_label_percent=20, augment=True, dataset_type = 'mnist
 
         # Convert list of data points to Subset objects
         subsets = [torch.utils.data.Subset(augmented_dataset, [idx for idx, _ in subset]) for subset in subsets]
-    else:
-        raise ValueError("Invalid split type. Choose 'IID' or 'Non-IID'.")
 
 
     federated_data = []
