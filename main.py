@@ -132,15 +132,24 @@ if __name__=='__main__':
     # Accessing the first federated dataset
     #labeled_data, unlabeled_data = federated_datasets[0]
 
-    data_segregated= get_datasets(n=num_clients+1,drop_label_percent = drop_label_percent, dataset_type=dataset, augment=augment, iid = is_iid)
+    #data_segregated= get_datasets(n=num_clients+1,drop_label_percent = drop_label_percent, dataset_type=dataset, augment=augment, iid = is_iid)
 
-    server = Server( teacher_model=get_model(teacher_string), student_model=get_model(student_string), labeled_data=data_segregated[0][0], unlab_data= data_segregated[0][1], device = getDevice(), testset=testset)
+    if(num_clients>1):
+        data_segregated= get_datasets(n=num_clients+1,drop_label_percent = drop_label_percent, dataset_type=dataset, augment=augment, iid = is_iid)
 
-    for i in range(num_clients):
+        server = Server( teacher_model=get_model(teacher_string), student_model=get_model(student_string), labeled_data=data_segregated[0][0], unlab_data= data_segregated[0][1], device = getDevice(), testset=testset)
 
-        client = Client( i, teacher_model= get_model(teacher_string),student_model= get_model(student_string), labset= data_segregated[i+1][0], unlabset = data_segregated[i+1][1], device= getDevice(), testset= testset )
+        for i in range(num_clients):
+
+            client = Client( i, teacher_model= get_model(teacher_string),student_model= get_model(student_string), labset= data_segregated[i+1][0], unlabset = data_segregated[i+1][1], device= getDevice(), testset= testset )
+            server.addClient(client)
+    elif(num_clients==1):
+        data_segregated= get_datasets(1,drop_label_percent = drop_label_percent, dataset_type=dataset, augment=augment, iid = is_iid)
+
+        server = Server( teacher_model=get_model(teacher_string), student_model=get_model(student_string), labeled_data=data_segregated[0][0], unlab_data= data_segregated[0][1], device = getDevice(), testset=testset)
+        client = Client( 0, teacher_model= get_model(teacher_string),student_model= get_model(student_string), labset= data_segregated[0][0], unlabset = data_segregated[0][1], device= getDevice(), testset= testset )
         server.addClient(client)
-    
+        
 
     for round in range(num_rounds):
         print(f"Starting Round {round}")
@@ -149,10 +158,14 @@ if __name__=='__main__':
             client = server.client_list[client_idx]
             client.training_loop(round, new_impl, num_rounds = num_rounds)
             server.updateClient(client_idx, client=client)
-
-        server.aggregate_teacher()
-        if(not new_impl):
-            server.aggregate_student()
+        
+        if(num_clients>1):
+            server.aggregate_teacher()
+            if(not new_impl):
+                server.aggregate_student()
+        else:
+                server.global_teacher_model = server.client_list[0].teacher_model
+                server.global_student_model = server.client_list[0].student_model
         
         teacher_test_loss, teacher_test_acc = server.compute_loss_accuracy(server.global_teacher_model, nn.CrossEntropyLoss(), testset)
         teacher_train_loss, teacher_train_acc = server.compute_loss_accuracy(server.global_teacher_model, nn.CrossEntropyLoss(), server.labeled_data )
