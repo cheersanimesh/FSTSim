@@ -14,11 +14,11 @@ Our approach proceeds towards implementing a teacher student model for semi supe
 
 **Local Training Model**
 
-![alt text](./images/local_training_model.png "img1")
+![Alt text](./images/local_training_model.png "img1")
 
 **Global training models**
 
-![alt text](./images/overall_model.png "img1")
+![Alt text](./images/overall_model.png "img1")
 
 ## Overall Results
 
