@@ -14,11 +14,11 @@ Our approach proceeds towards implementing a teacher student model for semi supe
 
 **Local Training Model**
 
-[!Alt text](./images/local_training_model.png)
+[!alt text](./images/local_training_model.png "img1")
 
 **Global training models**
 
-[!Alt text](./images/overall_model.png)
+[!alt text](./images/overall_model.png "img1")
 
 ## Overall Results
 
@@ -27,9 +27,9 @@ Our approach proceeds towards implementing a teacher student model for semi supe
 | Federated | 81.53 | 96.81 |
 | Non Federated | 91.21 | 97.32 |
 
-[!Alt text](https://github.com/cheersanimesh/FSTSim/images/fed_non_fed.png)
+[!alt text](https://github.com/cheersanimesh/FSTSim/images/fed_non_fed.png "img")
 
-[!Alt text](https://github.com/cheersanimesh/FSTSim/images/fed_non_fed_2.png)
+[!alt text](https://github.com/cheersanimesh/FSTSim/images/fed_non_fed_2.png "img")
 
 ## Conclusion
 
