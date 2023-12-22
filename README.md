@@ -27,9 +27,9 @@ Our approach proceeds towards implementing a teacher student model for semi supe
 | Federated | 81.53 | 96.81 |
 | Non Federated | 91.21 | 97.32 |
 
-[!Alt text](./images/fed_non_fed.png)
+[!Alt text](https://github.com/cheersanimesh/FSTSim/images/fed_non_fed.png)
 
-[!Alt text](./images/fed_non_fed_2.png)
+[!Alt text](https://github.com/cheersanimesh/FSTSim/images/fed_non_fed_2.png)
 
 ## Conclusion
 
